@@ -1,0 +1,99 @@
+TS Config:
+/* To learn more about this file see: https://angular.io/config/tsconfig. *
+
+- On modifying package.json with latest packages and run with npm install (to avoid conflicting and overwriting some can use npm install --force)
+- When install latest versions, the existed packages of file package-lock.json will be merged (with new information) together with these latest versions 
+However, if you run npm install --no-save, a new package-lock.json file will not be generated or updated. This is useful if you want to install dependencies without modifying the package-lock.json file (for example, if you're working on a shared project and don't want to accidentally commit changes to the lockfile).
+- In file angular.json to avoid warning of Angular CLI add this block:
+ "development": {
+              "buildOptimizer": false,
+              "optimization": false,
+              "vendorChunk": true,
+              "extractLicenses": false,
+              "sourceMap": true,
+              "namedChunks": true
+            }
+- In Angular, signUpForm.dirty is a property that returns a boolean value indicating whether the user has made changes to the form or not. If the user has made any changes to the form, signUpForm.dirty will be true, otherwise it will be false. This property is useful for checking if the user has made any changes to the form before allowing them to submit it.
+- ActivatedRouteSnapshot with attribute data can be used to store custom datas associated with a particular route.
+- (About canLoad and canActivate when apply for children component):
+In an Angular application, canLoad and canActivate are two guards that can be used to protect routes from being accessed by unauthorized users. The main difference between them is when they are executed.
+
+canLoad is executed before the module containing the lazy-loaded route is loaded. It checks if the user has permission to load the module and its associated routes. If the guard returns false, the module is not loaded and the user is redirected to another page. This helps to reduce the size of the initial bundle and improve performance.
+
+On the other hand, canActivate is executed after the module has been loaded, but before the route is activated. It checks if the user has permission to activate the route. If the guard returns false, the user is redirected to another page.
+
+So, if you want to protect a lazy-loaded module from being loaded by unauthorized users, you should use canLoad. If you want to protect a route within a module from being activated by unauthorized users, you should use canActivate.
+
+It's worth noting that canActivate can also be used to protect non-lazy-loaded routes, while canLoad can only be used with lazy-loaded routes. 
+
+- (About interceptors and how they are used in Angular and React):
+ interceptor is a middleware that intercepts HTTP requests or responses before they are sent or received by the server. Interceptors can be used to modify the request or response, add headers or authentication tokens, handle errors, or perform other tasks.
+
+Angular: implement method HttpInterceptor interface and overriding its intercept method (add it to providers in app module):
+@Injectable()
+export class AuthInterceptor implements HttpInterceptor {
+  intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+    const authToken = localStorage.getItem('authToken');
+    if (authToken) {
+      request = request.clone({
+        headers: request.headers.set('Authorization', `Bearer ${authToken}`)
+      });
+    }
+    return next.handle(request);
+  }
+}
+
+@NgModule({
+  providers: [
+    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }
+  ]
+})
+export class AppModule { }
+
+React: using fetching API or third-library like axios:
+function addAuthToken(config) {
+  const authToken = localStorage.getItem('authToken');
+  if (authToken) {
+    config.headers.Authorization = `Bearer ${authToken}`;
+  }
+  return config;
+}
+
+axios.interceptors.request.use(addAuthToken);
+
+Summary: For validating JWT Token, besides cheking isAuthenticated directly from localStorage.getITem("token") we also add 2 additional security check:
+1/ route guard service provides an additional layer of security by checking if the user is authorized to access a certain route based on their role, which is stored in a JWT token.
+2/ interceptors: for preventing from Cross-Site Request Forgery (XSRF) (setting with headers before finally sending to server)
+
+
+- About adding data dynamically when calling event on Material design styled data-table "MatTableDataSource":
+https://stackoverflow.com/questions/47581267/how-to-add-data-dynamically-to-mat-table-datasource
+
+
+- About Blob when using with Observable:
+A blob(binary large object) is a collection of binary data stored as a single entity. lobs are often used to store multimedia objects such as images, videos, and audio files.
+When used as a generic type with Observable for downloading PDF files, a blob represents the binary data of the PDF file. The Observable allows for asynchronous streaming of the binary data in chunks, which is useful for downloading large files without blocking the user interface
+
+- To check info associated with token use: jwt.io( https://jwt.io/ )
+
+File Structures in frontend of Project: 
+- environment folder: defines all environment runtime variables configurations
+- services folder: contains all the logicla services for working with API in server
+- shared folder: contains all the shared modules for the project
+- each folders with its names will handle all their logical functions relating to their API in server
+
+*
+file app.module.ts will be responsible for all the modules imported in the project
+MatDialogRef refers to a dialog opened by MatDialog Service
+FormBuilder will group all the form configurations and set up form builders
+
+
+Documents reference:
+1/Angular: https://angular.io/api/common/http/HttpClient#description
+2/Angular Material: https://v5.material.angular.io/components/snack-bar/overview
+3/Ngx-ui-loader:
+Main config: https://tdev.app/ngx-ui-loader (in our code made custom configuration as a module)
+Demo config and show: https://tdev.app/ngx-ui-loader/demo/
+
+
+Fix: Fix Save PDF when ordering

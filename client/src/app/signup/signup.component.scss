@@ -1,0 +1,24 @@
+.mat-toolbar {
+    margin: -24px;
+    width: auto;
+    margin-bottom:10px;
+}
+
+
+mat-form-field {
+    padding: 5px;
+}
+
+mat-hint {
+    color: red;
+}
+
+.mat-dialog-close {
+    padding-bottom: 3px;
+}
+
+.mat-actions {
+    display:flex;
+    justify-content: center;
+    align-items: center;
+}
